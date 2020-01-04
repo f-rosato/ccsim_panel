@@ -1,5 +1,6 @@
 import sys
 import time
+import json
 import select
 import paramiko
 from time import sleep
@@ -70,16 +71,23 @@ if __name__ == '__main__':
     # SETUP ---------------------------------------------------------
 
     arg_parser = argparse.ArgumentParser()
-    arg_parser.add_argument('-hs', help='host', required=True)
-    arg_parser.add_argument('-u', help='username', required=True)
-    arg_parser.add_argument('-p', help='password', required=True)
     arg_parser.add_argument('-lf', help='local_file', required=True)
+    arg_parser.add_argument('-hs', help='host', required=False)
+    arg_parser.add_argument('-u', help='username', required=False)
+    arg_parser.add_argument('-p', help='password', required=False)
     args = arg_parser.parse_args()
 
     host = args.hs
-    user = args.u
+    username = args.u
     password = args.p
     local_path = args.lf
+
+    if username is None:
+        with open('credential.json', 'r') as json_cr_f:
+            crs = json.load(json_cr_f)
+            host = crs['host']
+            username = crs['username']
+            password = crs['password']
 
     LANDING_FOLDER = '/tmp/landing/'
     INTERPRETER_PATH = '/ccvenv_0/bin/python3'
@@ -88,7 +96,7 @@ if __name__ == '__main__':
     PROGRAM_OUTPUT_FOLDER = '/ccsim/program_outputs'
     BASE_OUTPUT_FOLDER = '/ccsim/xlread_outputs'
 
-    do_command, upload_file, ssh_close = summon_commands(host, user, password)
+    do_command, upload_file, ssh_close = summon_commands(host, username, password)
 
     # FILE UPLOAD ----------------------------------------------------
     print('Uploading file...')
