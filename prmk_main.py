@@ -41,15 +41,15 @@ def summon_commands(host, user, password):
 
     def do_command(command_str, stdout_thru=False):
         stdin, stdout, stderr = ssh.exec_command(command_str)
-        while not stdout.channel.exit_status_ready():
+        while not stderr.channel.exit_status_ready():
             if not stdout_thru:
                 sleep(0.1)
             else:
-                if stdout.channel.recv_ready():
-                    rl, wl, xl = select.select([stdout.channel], [], [], 0.0)
+                if stderr.channel.recv_ready():
+                    rl, wl, xl = select.select([stderr.channel], [], [], 0.0)
                     if len(rl) > 0:
                         # Print data from stdout
-                        print(stdout.channel.recv(1024)),
+                        print(stderr.channel.recv(1024)),
 
     def upload_file(local_path, remote_path):
         sftp.put(local_path, remote_path)
