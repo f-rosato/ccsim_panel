@@ -134,7 +134,7 @@ if __name__ == '__main__':
                               pro_out=PROGRAM_OUTPUT_FOLDER,
                               sim_days=32,
                               gra_days=8,
-                              cut=0.3,
+                              cut=0.1,
                               seed=1233232323)
 
     # print(program_command)
