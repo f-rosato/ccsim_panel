@@ -6,8 +6,6 @@ from time import sleep
 import argparse
 import os
 
-LANDING_FOLDER = '/tmp/landing/'
-
 
 def _connect(host, user, password):
     i = 1
@@ -68,6 +66,9 @@ def summon_commands(host, user, password):
 # ssh_close()
 
 if __name__ == '__main__':
+
+    # SETUP ---------------------------------------------------------
+
     arg_parser = argparse.ArgumentParser()
     arg_parser.add_argument('-hs', help='host', required=True)
     arg_parser.add_argument('-u', help='username', required=True)
@@ -80,17 +81,58 @@ if __name__ == '__main__':
     password = args.p
     local_path = args.lf
 
+    LANDING_FOLDER = '/tmp/landing/'
+    INTERPRETER_PATH = '/ccvenv_0/bin/python3'
+    XLSREAD_PATH = '/ccsim/ccsim/xlsread.py'
+    MAIN_PATH = '/ccsim/main.py'
+    PROGRAM_OUTPUT_FOLDER = '/ccsim/program_outputs'
+    BASE_OUTPUT_FOLDER = '/ccsim/xlread_outputs'
+
     do_command, upload_file, ssh_close = summon_commands(host, user, password)
-    do_command('ls', stdout_thru=True)
+
+    # FILE UPLOAD ----------------------------------------------------
+    print('Uploading file...')
     _path, filename = os.path.split(local_path)
     # remote_path = LANDING_FOLDER + filename
     remote_path = os.path.join(LANDING_FOLDER, filename)
-    print(local_path)
-    print(remote_path)
     upload_file(local_path, remote_path)
 
-    # todo run xlsread
-    # todo run program
+    # RUN XLSREAD ----------------------------------------------------
+    print('Reading file...')
+    base_filename, extension = os.path.splitext(filename)
+    # xlsread_output_folder = os.path.join(BASE_OUTPUT_FOLDER, base_filename)
+    xlsread_output_folder = BASE_OUTPUT_FOLDER + '/' + base_filename
+
+    xlsread_command = '{int} {script} -f {file} -o {output}'.format(int=INTERPRETER_PATH,
+                                                                    script=XLSREAD_PATH,
+                                                                    file=remote_path,
+                                                                    output=xlsread_output_folder)
+
+    # print(xlsread_command)
+    do_command(xlsread_command, stdout_thru=True)
+
+    # RUN PROGRAM ----------------------------------------------------
+    print('Running program...')
+    program_command = '{int} {script} ' \
+                      '-f {folder} ' \
+                      '-o {pro_out} ' \
+                      '-sd {sim_days} ' \
+                      '-gd {gra_days} ' \
+                      '-sv "ipopt" ' \
+                      '-cd {cut} ' \
+                      '-s {seed}'\
+                      .format(int=INTERPRETER_PATH, script=MAIN_PATH,
+                              folder=xlsread_output_folder,
+                              pro_out=PROGRAM_OUTPUT_FOLDER,
+                              sim_days=32,
+                              gra_days=8,
+                              cut=0.3,
+                              seed=1233232323)
+
+    # print(program_command)
+    do_command(program_command, stdout_thru=True)
+
+    # OUTPUT ----------------------------------------------------
     # todo output
 
     # !!! REMEMBER!!!
