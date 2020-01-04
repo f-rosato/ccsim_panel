@@ -49,7 +49,7 @@ def summon_commands(host, user, password):
                     rl, wl, xl = select.select([stdout.channel], [], [], 0.0)
                     if len(rl) > 0:
                         # Print data from stdout
-                        print(stdout.channel.recv(1024)),
+                        print(stdout.channel.recv(1024).decode()),
 
     def upload_file(local_path, remote_path):
         sftp.put(local_path, remote_path)
