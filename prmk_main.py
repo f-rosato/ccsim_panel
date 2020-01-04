@@ -1,12 +1,13 @@
+import argparse
+import json
+import os
+import select
 import sys
 import time
-import json
-import select
-import paramiko
 from time import sleep
-import argparse
-import os
+
 import easygui
+import paramiko
 
 
 def _connect(host, user, password):
@@ -93,6 +94,7 @@ def summon_commands(host, user, password):
 
     def close():
         ssh.close()
+        # todo pkill the python processes spawned
 
     return do_command, upload_file, close
 
