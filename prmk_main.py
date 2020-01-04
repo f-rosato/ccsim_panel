@@ -6,10 +6,6 @@ from time import sleep
 import argparse
 import os
 
-# host = '173.249.52.100'
-# user = 'fede'
-# password = 'XvIFkdsj2im8mvg5hB31'
-
 LANDING_FOLDER = '/tmp/landing/'
 
 
