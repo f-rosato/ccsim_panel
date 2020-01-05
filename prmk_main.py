@@ -1,10 +1,8 @@
 import argparse
 import json
 import os
-import select
 import sys
 import time
-from time import sleep
 
 import easygui
 import paramiko
@@ -38,71 +36,41 @@ def _connect(host, user, password):
     return ssh_client, sftp_client
 
 
-class Summoner:
+class RemoteInterface:
     def __init__(self, host, user, password):
         self.host = host
         self.user = user
         self.password = password
+        self.pids_2_kill = []
 
     def __enter__(self):
         self.ssh, self.sftp = _connect(self.host, self.user, self.password)
         return self
 
-    def do_command(self, command_str, stdout_thru=False):
-        stdin, stdout, stderr = self.ssh.exec_command(command_str)
-        while not stdout.channel.exit_status_ready():
-            if not stdout_thru:
-                sleep(0.1)
-            else:
-                sleep(0.05)
-                if stdout.channel.recv_ready():
-                    rl, wl, xl = select.select([stdout.channel], [], [], 0.0)
-                    if len(rl) > 0:
-                        # Print data from stdout
-                        print(stdout.channel.recv(1024).decode()),
+    def do_command(self, command_str, pkill_on_exit=False, stdout_thru=False):
+        command = 'echo $$; exec ' + command_str
+        stdin, stdout, stderr = self.ssh.exec_command(command)
+        pid = int(stdout.readline())  # first line is pid
+        if pkill_on_exit:
+            self.pids_2_kill.append(pid)
+
+        if stdout_thru:
+            while True:
+                line = stdout.readline().rstrip('\n')
+                if not line:
+                    break
+                print(line)
 
     def upload_file(self, local_path, remote_path):
         self.sftp.put(local_path, remote_path)
         self.sftp.close()
 
-    def close(self):
-        self.ssh.close()
-
     def __exit__(self, exc_type, exc_val, exc_tb):
-        self.close()
+        self.ssh.close()
+        for pid in self.pids_2_kill:
+            _stdin, _stdout, _stderr = self.ssh.exec_command('kill {}'.format(pid))
+            _stdin, _stdout, _stderr = self.ssh.exec_command('pkill -p {}'.format(pid))
 
-
-def summon_commands(host, user, password):
-    ssh, sftp = _connect(host, user, password)
-
-    def do_command(command_str, stdout_thru=False):
-        stdin, stdout, stderr = ssh.exec_command(command_str)
-        while not stdout.channel.exit_status_ready():
-            if not stdout_thru:
-                sleep(0.1)
-            else:
-                sleep(0.05)
-                if stdout.channel.recv_ready():
-                    rl, wl, xl = select.select([stdout.channel], [], [], 0.0)
-                    if len(rl) > 0:
-                        # Print data from stdout
-                        print(stdout.channel.recv(1024).decode()),
-
-    def upload_file(local_path, remote_path):
-        sftp.put(local_path, remote_path)
-        sftp.close()
-
-    def close():
-        ssh.close()
-        # todo pkill the python processes spawned
-
-    return do_command, upload_file, close
-
-
-# do_command, upload_file, ssh_close = summon_commands(host, user, password)
-# do_command('ls', stdout_thru=True)
-# upload_file(r"C:\Users\FR\Desktop\culo.txt", "/tmp/prova/culo.txt")
-# ssh_close()
 
 if __name__ == '__main__':
 
@@ -135,28 +103,25 @@ if __name__ == '__main__':
     PROGRAM_OUTPUT_FOLDER = '/ccsim/program_outputs'
     BASE_OUTPUT_FOLDER = '/ccsim/xlread_outputs'
 
-    with Summoner(host, username, password) as command_summoner:
+    with RemoteInterface(host, username, password) as r_interface:
 
         # FILE UPLOAD ----------------------------------------------------
         print('Uploading file...')
         _path, filename = os.path.split(local_path)
         # remote_path = LANDING_FOLDER + filename
         remote_path = os.path.join(LANDING_FOLDER, filename)
-        command_summoner.upload_file(local_path, remote_path)
+        r_interface.upload_file(local_path, remote_path)
 
         # RUN XLSREAD ----------------------------------------------------
         print('Reading file...')
         base_filename, extension = os.path.splitext(filename)
         # xlsread_output_folder = os.path.join(BASE_OUTPUT_FOLDER, base_filename)
         xlsread_output_folder = BASE_OUTPUT_FOLDER + '/' + base_filename
-
         xlsread_command = '{int} {script} -f {file} -o {output}'.format(int=INTERPRETER_PATH,
                                                                         script=XLSREAD_PATH,
                                                                         file=remote_path,
                                                                         output=xlsread_output_folder)
-
-        # print(xlsread_command)
-        command_summoner.do_command(xlsread_command, stdout_thru=True)
+        r_interface.do_command(xlsread_command, stdout_thru=True)
 
         # RUN PROGRAM ----------------------------------------------------
         print('Running program...')
@@ -176,8 +141,7 @@ if __name__ == '__main__':
                                   cut=0.1,
                                   seed=1233232323)
 
-        # print(program_command)
-        command_summoner.do_command(program_command, stdout_thru=True)
+        r_interface.do_command(program_command, pkill_on_exit=True, stdout_thru=True)
 
         # OUTPUT ----------------------------------------------------
         # todo output
