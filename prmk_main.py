@@ -8,10 +8,13 @@ import easygui
 import paramiko
 
 
+CONN_RETRIES = 30
+
+
 def _connect(host, user, password):
     i = 1
     while True:
-        print("Trying to connect to {} ({}/30)".format(host, i))
+        print("Trying to connect to {} ({}/{})".format(host, i, CONN_RETRIES))
 
         try:
             ssh_client = paramiko.SSHClient()
@@ -28,7 +31,7 @@ def _connect(host, user, password):
             time.sleep(2)
 
         # If we could not connect within time limit
-        if i == 30:
+        if i == CONN_RETRIES:
             print("Could not connect to {}. Giving up".format(host))
             sys.exit(1)
 
@@ -57,19 +60,29 @@ class RemoteInterface:
         if stdout_thru:
             while True:
                 line = stdout.readline().rstrip('\n')
-                if not line:
+                # eline = stderr.readline().rstrip('\n')
+                if line:
+                    print(line)
+                    continue
+                # if eline:
+                #     print('ERR: {}'.format(eline))
+                #     continue
+
+                if stdout.channel.exit_status_ready():
                     break
-                print(line)
 
     def upload_file(self, local_path, remote_path):
         self.sftp.put(local_path, remote_path)
-        self.sftp.close()
+
+    def download_file(self, remote_path, local_path):
+        self.sftp.get(remote_path, local_path)
 
     def __exit__(self, exc_type, exc_val, exc_tb):
-        self.ssh.close()
         for pid in self.pids_2_kill:
             _stdin, _stdout, _stderr = self.ssh.exec_command('kill {}'.format(pid))
             _stdin, _stdout, _stderr = self.ssh.exec_command('pkill -p {}'.format(pid))
+        self.sftp.close()
+        self.ssh.close()
 
 
 if __name__ == '__main__':
@@ -77,17 +90,20 @@ if __name__ == '__main__':
     # SETUP ---------------------------------------------------------
 
     arg_parser = argparse.ArgumentParser()
-    # arg_parser.add_argument('-lf', help='local_file', required=True)
-    arg_parser.add_argument('-hs', help='host', required=False)
-    arg_parser.add_argument('-u', help='username', required=False)
-    arg_parser.add_argument('-p', help='password', required=False)
+    arg_parser.add_argument('-hs', help='host', required=True)
+    arg_parser.add_argument('-u', help='username', required=True)
+    arg_parser.add_argument('-p', help='password', required=True)
+    arg_parser.add_argument('-lf', help='local_file', required=False)
     args = arg_parser.parse_args()
 
     host = args.hs
     username = args.u
     password = args.p
-    # local_path = args.lf
-    local_path = easygui.fileopenbox()
+
+    if args.lf is not None:
+        local_input_file_path = args.lf
+    else:
+        local_input_file_path = easygui.fileopenbox()
 
     if username is None:
         with open('credential.json', 'r') as json_cr_f:
@@ -100,23 +116,23 @@ if __name__ == '__main__':
     INTERPRETER_PATH = '/ccvenv_0/bin/python3'
     XLSREAD_PATH = '/ccsim/ccsim/xlsread.py'
     MAIN_PATH = '/ccsim/main.py'
-    PROGRAM_OUTPUT_FOLDER = '/ccsim/program_outputs'
+    PROGRAM_OUTPUT_PATH = '/ccsim/program_outputs/{}_OUT.xlsx'
     BASE_OUTPUT_FOLDER = '/ccsim/xlread_outputs'
 
     with RemoteInterface(host, username, password) as r_interface:
 
         # FILE UPLOAD ----------------------------------------------------
         print('Uploading file...')
-        _path, filename = os.path.split(local_path)
+        local_input_folder_path, input_filename = os.path.split(local_input_file_path)
         # remote_path = LANDING_FOLDER + filename
-        remote_path = os.path.join(LANDING_FOLDER, filename)
-        r_interface.upload_file(local_path, remote_path)
+        remote_path = os.path.join(LANDING_FOLDER, input_filename)
+        r_interface.upload_file(local_input_file_path, remote_path)
 
         # RUN XLSREAD ----------------------------------------------------
         print('Reading file...')
-        base_filename, extension = os.path.splitext(filename)
+        base_input_filename, extension = os.path.splitext(input_filename)
         # xlsread_output_folder = os.path.join(BASE_OUTPUT_FOLDER, base_filename)
-        xlsread_output_folder = BASE_OUTPUT_FOLDER + '/' + base_filename
+        xlsread_output_folder = BASE_OUTPUT_FOLDER + '/' + base_input_filename
         xlsread_command = '{int} {script} -f {file} -o {output}'.format(int=INTERPRETER_PATH,
                                                                         script=XLSREAD_PATH,
                                                                         file=remote_path,
@@ -125,6 +141,7 @@ if __name__ == '__main__':
 
         # RUN PROGRAM ----------------------------------------------------
         print('Running program...')
+        remote_output_file_path = PROGRAM_OUTPUT_PATH.format(base_input_filename)
         program_command = '{int} {script} ' \
                           '-f {folder} ' \
                           '-o {pro_out} ' \
@@ -135,15 +152,18 @@ if __name__ == '__main__':
                           '-s {seed}'\
                           .format(int=INTERPRETER_PATH, script=MAIN_PATH,
                                   folder=xlsread_output_folder,
-                                  pro_out=PROGRAM_OUTPUT_FOLDER,
-                                  sim_days=32,
-                                  gra_days=8,
-                                  cut=0.1,
+                                  pro_out=remote_output_file_path,
+                                  sim_days=8,
+                                  gra_days=4,
+                                  cut=0.07,
                                   seed=1233232323)
 
+        # print(program_command)
         r_interface.do_command(program_command, pkill_on_exit=True, stdout_thru=True)
 
         # OUTPUT ----------------------------------------------------
-        # todo output
+        time.sleep(1)
+        r_interface.download_file(remote_output_file_path,
+                                  os.path.join(local_input_folder_path, base_input_filename + '_OUT' + extension))
 
 
