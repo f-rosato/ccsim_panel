@@ -153,8 +153,8 @@ if __name__ == '__main__':
                           .format(int=INTERPRETER_PATH, script=MAIN_PATH,
                                   folder=xlsread_output_folder,
                                   pro_out=remote_output_file_path,
-                                  sim_days=8,
-                                  gra_days=4,
+                                  sim_days=32,
+                                  gra_days=8,
                                   cut=0.07,
                                   seed=1233232323)
 
