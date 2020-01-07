@@ -21,10 +21,10 @@ if __name__ == '__main__':
 
     # configuration can be either passed or will be asked for with easygui
     arg_parser.add_argument('-lf', help='local_file', required=False)
-    arg_parser.add_argument('-of', help='local_file', required=False)
-    arg_parser.add_argument('-sd', help='local_file', required=False)
-    arg_parser.add_argument('-gd', help='local_file', required=False)
-    arg_parser.add_argument('-cd', help='local_file', required=False)
+    arg_parser.add_argument('-of', help='output_file', required=False)
+    arg_parser.add_argument('-sd', help='simulation days', required=False)
+    arg_parser.add_argument('-gd', help='gradient days', required=False)
+    arg_parser.add_argument('-cd', help='cut depth', required=False)
     args = arg_parser.parse_args()
 
     # authentication
