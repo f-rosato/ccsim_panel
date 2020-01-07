@@ -26,9 +26,9 @@ if __name__ == '__main__':
     arg_parser.add_argument('-cd', help='cut depth', required=False)
     args = arg_parser.parse_args()
 
-    config = args.c
+    config_filename = args.c
 
-    with open('config.json', 'r') as config_file:
+    with open(config_filename, 'r') as config_file:
         cfg = json.load(config_file)
 
     # folder configuration
@@ -57,7 +57,6 @@ if __name__ == '__main__':
         local_output_file_path = args.of
     else:
         local_output_file_path = easygui.filesavebox('Scegli dove salvare il file di output',
-
                                                      default=base_input_filename + '_OUT' + extension)
     # sim configuration
     if args.sd is not None and args.gd is not None and args.cd is not None:
