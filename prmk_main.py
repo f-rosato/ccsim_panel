@@ -1,6 +1,7 @@
 import argparse
 import os
 import time
+import json
 
 import easygui
 
@@ -15,9 +16,7 @@ if __name__ == '__main__':
     # SETUP ---------------------------------------------------------
 
     arg_parser = argparse.ArgumentParser()
-    arg_parser.add_argument('-hs', help='host', required=True)
-    arg_parser.add_argument('-u', help='username', required=True)
-    arg_parser.add_argument('-p', help='password', required=True)
+    arg_parser.add_argument('-c', help='config', required=True)
 
     # configuration can be either passed or will be asked for with easygui
     arg_parser.add_argument('-lf', help='local_file', required=False)
@@ -27,10 +26,23 @@ if __name__ == '__main__':
     arg_parser.add_argument('-cd', help='cut depth', required=False)
     args = arg_parser.parse_args()
 
+    config = args.c
+
+    with open('config.json', 'r') as config_file:
+        cfg = json.load(config_file)
+
+    # folder configuration
+    LANDING_FOLDER = cfg['LANDING_FOLDER']
+    INTERPRETER_PATH = cfg['INTERPRETER_PATH']
+    XLSREAD_PATH = cfg['XLSREAD_PATH']
+    MAIN_PATH = cfg['MAIN_PATH']
+    PROGRAM_OUTPUT_PATH = cfg['PROGRAM_OUTPUT_PATH']
+    BASE_OUTPUT_FOLDER = cfg['BASE_OUTPUT_FOLDER']
+
     # authentication
-    host = args.hs
-    username = args.u
-    password = args.p
+    host = cfg['host']
+    username = cfg['username']
+    password = cfg['password']
 
     # input file
     if args.lf is not None:
@@ -80,13 +92,6 @@ if __name__ == '__main__':
         sim_days = fieldValues[0]
         gra_days = fieldValues[1]
         cut_depth = fieldValues[2]
-
-    LANDING_FOLDER = '/tmp/landing/'
-    INTERPRETER_PATH = '/ccvenv_0/bin/python3'
-    XLSREAD_PATH = '/ccsim/ccsim/xlsread.py'
-    MAIN_PATH = '/ccsim/main.py'
-    PROGRAM_OUTPUT_PATH = '/ccsim/program_outputs/{}_OUT.xlsx'
-    BASE_OUTPUT_FOLDER = '/ccsim/xlread_outputs'
 
     with RemoteInterface(host, username, password) as r_i:
 
