@@ -72,7 +72,7 @@ if __name__ == '__main__':
                       "Cut depth"]
         fieldValues_df = [args.sd if args.sd is not None else DEF_SD,
                           args.gd if args.gd is not None else DEF_GD,
-                          args.cd if args.cd is not None else DEF_CD]
+                          '{:.0%}'.format(args.cd) if args.cd is not None else '{:.0%}'.format(DEF_CD)]
 
         fieldValues = easygui.multenterbox(msg, title, fieldNames, fieldValues_df)
 
@@ -90,13 +90,12 @@ if __name__ == '__main__':
 
         sim_days = fieldValues[0]
         gra_days = fieldValues[1]
-        cut_depth = fieldValues[2]
+        cut_depth = float(fieldValues[2].rstrip('%'))/100
 
     with RemoteInterface(host, username, password) as r_i:
 
         # FILE UPLOAD ----------------------------------------------------
         print('Uploading file...')
-        # remote_path = LANDING_FOLDER + filename
         remote_path = os.path.join(LANDING_FOLDER, input_filename)
         r_i.upload_file(local_input_file_path, remote_path)
 
