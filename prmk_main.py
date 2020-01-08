@@ -90,7 +90,7 @@ if __name__ == '__main__':
 
         sim_days = fieldValues[0]
         gra_days = fieldValues[1]
-        cut_depth = float(fieldValues[2].rstrip('%'))/100
+        cut_depth = str(float(fieldValues[2].rstrip('%'))/100)
 
     with RemoteInterface(host, username, password) as r_i:
 
@@ -107,6 +107,7 @@ if __name__ == '__main__':
                                                                         script=XLSREAD_PATH,
                                                                         file=remote_path,
                                                                         output=xlsread_output_folder)
+        # print(xlsread_command)
         r_i.do_command(xlsread_command, stdout_thru=True)
 
         # RUN PROGRAM ----------------------------------------------------
