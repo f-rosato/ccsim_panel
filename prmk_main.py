@@ -115,7 +115,7 @@ if __name__ == '__main__':
         print('Reading file...')
         # xlsread_output_folder = os.path.join(BASE_OUTPUT_FOLDER, base_filename)
         xlsread_output_folder = BASE_OUTPUT_FOLDER + '/' + base_input_filename
-        xlsread_command = '{int} {script} -f {file} -o {output}'.format(int=INTERPRETER_PATH,
+        xlsread_command = '{int} {script} -f "{file}" -o "{output}"'.format(int=INTERPRETER_PATH,
                                                                         script=XLSREAD_PATH,
                                                                         file=remote_path,
                                                                         output=xlsread_output_folder)
@@ -126,8 +126,8 @@ if __name__ == '__main__':
         print('Running program...')
         remote_output_file_path = PROGRAM_OUTPUT_PATH.format(base_input_filename)
         program_command = '{int} {script} ' \
-                          '-f {folder} ' \
-                          '-o {pro_out} ' \
+                          '-f "{folder}" ' \
+                          '-o "{pro_out}" ' \
                           '-sd {sim_days} ' \
                           '-gd {gra_days} ' \
                           '-sv "glpk" ' \
