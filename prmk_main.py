@@ -1,7 +1,9 @@
 import argparse
-import os
-import time
 import json
+import logging
+import os
+import sys
+import time
 
 import easygui
 
@@ -24,12 +26,22 @@ if __name__ == '__main__':
     arg_parser.add_argument('-sd', help='simulation days', required=False)
     arg_parser.add_argument('-gd', help='gradient days', required=False)
     arg_parser.add_argument('-cd', help='cut depth', required=False)
+    arg_parser.add_argument('-pc', help='print commands', required=False, default=False)
     args = arg_parser.parse_args()
 
     config_filename = args.c
 
     with open(config_filename, 'r') as config_file:
         cfg = json.load(config_file)
+
+    lgr = logging.getLogger('ccsim_panel')
+    strh = logging.StreamHandler(stream=sys.stdout)
+    lgr.addHandler(strh)
+
+    if args.pc:
+        lgr.setLevel(logging.DEBUG)
+    else:
+        lgr.setLevel(logging.WARNING)
 
     # folder configuration
     LANDING_FOLDER = cfg['LANDING_FOLDER']
@@ -107,7 +119,7 @@ if __name__ == '__main__':
                                                                         script=XLSREAD_PATH,
                                                                         file=remote_path,
                                                                         output=xlsread_output_folder)
-        # print(xlsread_command)
+        lgr.debug(xlsread_command)
         r_i.do_command(xlsread_command, stdout_thru=True)
 
         # RUN PROGRAM ----------------------------------------------------
@@ -118,9 +130,10 @@ if __name__ == '__main__':
                           '-o {pro_out} ' \
                           '-sd {sim_days} ' \
                           '-gd {gra_days} ' \
-                          '-sv "ipopt" ' \
+                          '-sv "glpk" ' \
                           '-cd {cut} ' \
-                          '-s {seed}'\
+                          '-s {seed} '\
+                          '-ob "agent_cost_avramidis"'\
                           .format(int=INTERPRETER_PATH, script=MAIN_PATH,
                                   folder=xlsread_output_folder,
                                   pro_out=remote_output_file_path,
@@ -129,7 +142,7 @@ if __name__ == '__main__':
                                   cut=cut_depth,
                                   seed=14687458)
 
-        # print(program_command)
+        lgr.debug(program_command)
         r_i.do_command(program_command, pkill_on_exit=True, stdout_thru=True)
 
         # OUTPUT ----------------------------------------------------
