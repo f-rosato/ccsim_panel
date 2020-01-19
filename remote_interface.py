@@ -6,7 +6,7 @@ import paramiko
 CONN_RETRIES = 30
 
 
-def _connect(host, user, password):
+def _connect(host, ssh_port, user, password):
     i = 1
     while True:
         print("Trying to connect to {} ({}/{})".format(host, i, CONN_RETRIES))
@@ -14,7 +14,7 @@ def _connect(host, user, password):
         try:
             ssh_client = paramiko.SSHClient()
             ssh_client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
-            ssh_client.connect(host, 22, username=user, password=password)
+            ssh_client.connect(host, ssh_port, username=user, password=password)
             print("Connected to {}".format(host))
             break
         except paramiko.AuthenticationException:
@@ -35,19 +35,20 @@ def _connect(host, user, password):
 
 
 class RemoteInterface:
-    def __init__(self, host, user, password):
+    def __init__(self, host, port, user, password):
         self.host = host
         self.user = user
+        self.port = port
         self.password = password
         self.pids_2_kill = []
 
     def __enter__(self):
-        self.ssh, self.sftp = _connect(self.host, self.user, self.password)
+        self.ssh, self.sftp = _connect(self.host, self.port, self.user, self.password)
         return self
 
     def do_command(self, command_str, pkill_on_exit=False, stdout_thru=False):
         command = 'echo $$; exec ' + command_str
-        stdin, stdout, stderr = self.ssh.exec_command(command)
+        stdin, stdout, stderr = self.ssh.exec_command(command, get_pty=not stdout_thru)
         pid = int(stdout.readline())  # first line is pid
         if pkill_on_exit:
             self.pids_2_kill.append(pid)

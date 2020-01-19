@@ -1,0 +1,12 @@
+{
+  "LANDING_FOLDER" : "/path/to/landing",
+  "INTERPRETER_PATH" : "/path/to/interpreter",
+  "XLSREAD_PATH" : "/path/to/ccsim/read_xls.py",
+  "MAIN_PATH" : "/path/to/ccsim/main.py",
+  "PROGRAM_OUTPUT_PATH" : "/path/to/program_outputs/{}_OUT.xlsx",
+  "BASE_OUTPUT_FOLDER" : "/path/to/xlread_outputs",
+  "host": "0.0.0.0",
+  "ssh_port": "22",
+  "username": "username",
+  "password": "password"
+ }

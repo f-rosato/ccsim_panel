@@ -1,0 +1,80 @@
+CCSIM
+istruzioni installazione lato utente PER WINDOWS
+
+PREREQUISITI
+1) Installare Python 3.6+
+    scaricare l'installer con questo link https://www.python.org/ftp/python/3.8.1/python-3.8.1-amd64.exe
+    installarlo come un qualsiasi programma. Procedere con l'installazione tipica, senza modificare i parametri.
+
+2) Installare il client SSH Bitvise
+    scaricare l'installer con questo link https://dl.bitvise.com/BvSshClient-Inst.exe
+    installarlo come un qualsiasi programma
+
+3) Scaricare i file utente
+    Scaricare i file per l'utente da questo link https://github.com/f-rosato/ccsim_panel/archive/master.zip
+    Il file scaricato è un archivio zip. Decomprimerlo in una cartella di proprio gradimento.
+
+4) Nella cartella in cui si sono decompressi i file, eseguire il file "install_easygui.bat" con un doppio clic.
+    Questo programma va eseguito una tantum in questo momento. Eseguirlo in seguito per errore non è un problema:
+    non avrà alcun effetto.
+
+5) Se si ha a disposizione un file di configurazione json già pronto, sostituirlo al file config_blank.json. In
+    alternativa compilare questo file con i parametri appropriati. La compilazione di questo file va eseguita da un
+    utente esperto, al corrente di come è installato CCSIM lato server.
+
+6) Aprire il file di configurazione con un editor di testo, per esempio blocco note (clic destro, apri con, blocco note)
+    e annotare in un posto reperibile (un file sul desktop, su carta, etc) i parametri indicati da:
+    "PROGRAM_OUTPUT_PATH"
+    "host"
+    "user"
+    "password"
+
+
+AVVIO NORMALE
+1) Approntare un file di input. Tra i file scaricati è presente uno zip che contiene il template di input da usare
+    come base. Lo zip è coperto da password per sicurezza; chiedere la password a un utente esperto al corrente
+    dell'installazione di ccsim.
+
+1) Avviare "avvia_simulatore" con un doppio clic. Il programma reperisce in automatico il file config presente nella
+    cartella, quello che prima è stato compilato o sostituito.
+
+2) Alla domanda "Scegli se vuoi eseguire il programma in batch" digitare N per No
+
+3) Seguire le istruzioni per scegliere il file di input
+
+4) Seguire le istruzioni per scegliere il file di output
+
+5) Scegliere i parametri
+
+6) Il programma viene eseguito e al termine, salvo errori di connessione, salva il file dove indicato
+
+
+AVVIO BATCH
+1) Approntare un file di input. Tra i file scaricati è presente uno zip che contiene il template di input da usare
+    come base. Lo zip è coperto da password per sicurezza; chiedere la password a un utente esperto al corrente
+    dell'installazione di ccsim.
+
+1) Avviare "avvia_simulatore" con un doppio clic. Il programma reperisce in automatico il file config presente nella
+    cartella, quello che prima è stato compilato o sostituito.
+
+2) Alla domanda "Scegli se vuoi eseguire il programma in batch" digitare S per SI
+
+3) Seguire le istruzioni per scegliere il file di input
+
+4) Seguire le istruzioni per scegliere il file di output
+
+5) Scegliere i parametri
+
+6) Il programma parte sul server, mentre la finestra locale viene chiusa.
+
+7) Per controllare se il programma ha finito e pertanto il file di output è stato creato:
+
+    - Aprire BITVISE, installato al punto 2 dei prerequisiti
+    - Come "initial method" scegliere password dal menu a tendina;
+    - Come "porta" inserire il numero 22;
+    - Inserire i campi appropriati come annotati al punto 6 dei prerequisiti;
+    - Schiacciare Login in basso a sinistra
+    - Schiacciare sul pulsante new SFTP window sulla barra a sinistra;
+    - Con la schermata che si apre, simile a Explorer, navigare nella parte DESTRA (remote files) fino alla cartella
+      annotata come "PROGRAM_OUTPUT_PATH" al punto 6. In questa cartella finiscono tutti i file di output.
+
