@@ -34,7 +34,6 @@ if __name__ == '__main__':
     config_filename = args.c
     batch_mode = True if args.bt == 'yes' else False
     foreground_mode = not batch_mode
-    print(batch_mode)
 
     with open(config_filename, 'r') as config_file:
         cfg = json.load(config_file)
