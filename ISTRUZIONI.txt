@@ -2,17 +2,18 @@ CCSIM
 istruzioni installazione lato utente PER WINDOWS
 
 PREREQUISITI
-1) Installare Python 3.6+
+1) Scaricare i file utente
+    Scaricare i file per l'utente da questo link https://github.com/f-rosato/ccsim_panel/archive/master.zip
+    Sono gli stessi file tra i quali c'è il presente foglio di istruzioni
+    Il file scaricato è un archivio zip. Decomprimerlo in una cartella di proprio gradimento.
+
+2) Installare Python 3.6+
     scaricare l'installer con questo link https://www.python.org/ftp/python/3.8.1/python-3.8.1-amd64.exe
     installarlo come un qualsiasi programma. Procedere con l'installazione tipica, senza modificare i parametri.
 
-2) Installare il client SSH Bitvise
+3) Installare il client SSH Bitvise
     scaricare l'installer con questo link https://dl.bitvise.com/BvSshClient-Inst.exe
     installarlo come un qualsiasi programma
-
-3) Scaricare i file utente
-    Scaricare i file per l'utente da questo link https://github.com/f-rosato/ccsim_panel/archive/master.zip
-    Il file scaricato è un archivio zip. Decomprimerlo in una cartella di proprio gradimento.
 
 4) Nella cartella in cui si sono decompressi i file, eseguire il file "install_easygui.bat" con un doppio clic.
     Questo programma va eseguito una tantum in questo momento. Eseguirlo in seguito per errore non è un problema:
