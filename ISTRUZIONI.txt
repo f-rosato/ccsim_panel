@@ -23,11 +23,12 @@ PREREQUISITI
     alternativa compilare questo file con i parametri appropriati. La compilazione di questo file va eseguita da un
     utente esperto, al corrente di come è installato CCSIM lato server.
 
-6) Aprire il file di configurazione con un editor di testo, per esempio blocco note (clic destro, apri con, blocco note)
-    e annotare in un posto reperibile (un file sul desktop, su carta, etc) i parametri indicati da:
+6) Aprire il file di configurazione di cui si è appena parlato al punto 5 con un editor di testo, per esempio blocco
+    note (clic destro, apri con, blocco note) e annotare in un posto reperibile (un file sul desktop, su carta, etc)
+    i parametri indicati da:
     "PROGRAM_OUTPUT_PATH"
     "host"
-    "user"
+    "username"
     "password"
 
 
@@ -55,20 +56,17 @@ AVVIO BATCH
     come base. Lo zip è coperto da password per sicurezza; chiedere la password a un utente esperto al corrente
     dell'installazione di ccsim.
 
-1) Avviare "avvia_simulatore" con un doppio clic. Il programma reperisce in automatico il file config presente nella
-    cartella, quello che prima è stato compilato o sostituito.
+1) Avviare "avvia_simulatore" con un doppio clic.
 
 2) Alla domanda "Scegli se vuoi eseguire il programma in batch" digitare S per SI
 
-3) Seguire le istruzioni per scegliere il file di input
+3) Seguire le istruzioni per scegliere il file di input.
 
-4) Seguire le istruzioni per scegliere il file di output
+4) Scegliere i parametri.
 
-5) Scegliere i parametri
+5) Il programma parte sul server, mentre la finestra locale viene chiusa.
 
-6) Il programma parte sul server, mentre la finestra locale viene chiusa.
-
-7) Per controllare se il programma ha finito e pertanto il file di output è stato creato:
+6) Per controllare se il programma ha finito e pertanto il file di output è stato creato:
 
     - Aprire BITVISE, installato al punto 2 dei prerequisiti
     - Come "initial method" scegliere password dal menu a tendina;

@@ -73,12 +73,14 @@ if __name__ == '__main__':
     local_input_folder_path, input_filename = os.path.split(local_input_file_path)
     base_input_filename, extension = os.path.splitext(input_filename)
 
-    # output folder
-    if args.of is not None:
-        local_output_file_path = args.of
-    else:
-        local_output_file_path = easygui.filesavebox('Scegli dove salvare il file di output',
-                                                     default=base_input_filename + '_OUT' + extension)
+    if batch_mode:
+        # output folder
+        if args.of is not None:
+            local_output_file_path = args.of
+        else:
+            local_output_file_path = easygui.filesavebox('Scegli dove salvare il file di output',
+                                                         default=base_input_filename + '_OUT' + extension)
+
     # sim configuration
     if args.sd is not None and args.gd is not None and args.cd is not None:
         sim_days = args.sd
