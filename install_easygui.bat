@@ -1,1 +1,1 @@
-pip install easygui paramiko
+pip install easygui fabric

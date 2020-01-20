@@ -141,12 +141,12 @@ if __name__ == '__main__':
             output=xlsread_output_folder)
 
         lgr.debug(xlsread_command)
-        r_i.do_command(xlsread_command, stdout_thru=True)
+        r_i.do_command(xlsread_command, background=False)
 
         # RUN PROGRAM ----------------------------------------------------
         print('Running program...')
         remote_output_file_path = PROGRAM_OUTPUT_PATH.format(base_input_filename)
-        program_command = '{nohup}{int} {script} ' \
+        program_command = '{int} {script} ' \
                           '-f "{folder}" ' \
                           '-o "{pro_out}" ' \
                           '-sd {sim_days} ' \
@@ -155,25 +155,17 @@ if __name__ == '__main__':
                           '-cd {cut} ' \
                           '-s {seed} '\
                           '{avra}'\
-                          '{ebang}'\
-                          .format(nohup='nohup ' if batch_mode else '',
-                                  int=INTERPRETER_PATH, script=MAIN_PATH,
+                          .format(int=INTERPRETER_PATH, script=MAIN_PATH,
                                   folder=xlsread_output_folder,
                                   pro_out=remote_output_file_path,
                                   sim_days=sim_days,
                                   gra_days=gra_days,
                                   cut=cut_depth,
                                   seed=14687458,
-                                  avra='-ob "agent_cost_avramidis"' if use_avra else '',
-                                  ebang=' > /dev/null 2>&1 &' if batch_mode else '')
+                                  avra='-ob "agent_cost_avramidis"' if use_avra else '')
 
         lgr.debug(program_command)
-        if foreground_mode:
-            r_i.do_command(program_command, pkill_on_exit=foreground_mode, stdout_thru=foreground_mode)
-        else:
-            transport = r_i.ssh.get_transport()
-            channel = transport.open_session()
-            channel.exec_command(program_command)
+        r_i.do_command(program_command, background=batch_mode)
 
         # OUTPUT ----------------------------------------------------
         time.sleep(1)
