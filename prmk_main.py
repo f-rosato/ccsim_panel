@@ -72,7 +72,7 @@ if __name__ == '__main__':
     local_input_folder_path, input_filename = os.path.split(local_input_file_path)
     base_input_filename, extension = os.path.splitext(input_filename)
 
-    if batch_mode:
+    if foreground_mode:
         # output folder
         if args.of is not None:
             local_output_file_path = args.of
