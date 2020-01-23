@@ -21,7 +21,7 @@ class RemoteInterface:
     def do_command(self, command_str, background=False):
         if background:
             command_str = 'nohup {} >& /dev/null &'.format(command_str)
-        self.c.sudo(command_str, pty=not background)
+        self.c.run(command_str, pty=not background)
 
     def upload_file(self, local_path, remote_path):
         self.c.put(local_path, remote_path)

@@ -82,10 +82,11 @@ if __name__ == '__main__':
                                                          default=base_input_filename + '_OUT' + extension)
 
     if args.fa is not None:
-        fa = float(args.fa)
-        if fa == -1.0:
+        fa = args.fa
+        if fa == 'none':
             fa_string = ''
         else:
+            fa = float(args.fa)
             fa_string = ' -fa {}'.format(fa)
     else:
         fa_string = ''

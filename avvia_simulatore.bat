@@ -12,7 +12,7 @@ echo.
 echo Scegli se vuoi eseguire il programma in baackground:
 CHOICE /C SNFC /M "(S per Si, N per No, F per Si+forza alpha, C per Cancel)"
 
-set fa=-1
+set fa=none
 IF ERRORLEVEL 1 SET BT=yes
 IF ERRORLEVEL 2 SET BT=no
 
