@@ -28,6 +28,7 @@ if __name__ == '__main__':
     arg_parser.add_argument('-sd', help='simulation days', required=False)
     arg_parser.add_argument('-gd', help='gradient days', required=False)
     arg_parser.add_argument('-cd', help='cut depth', required=False)
+    arg_parser.add_argument('-fa', help='force alpha', required=False)
     arg_parser.add_argument('-pc', help='print commands', required=False, default=False)
     args = arg_parser.parse_args()
 
@@ -80,12 +81,22 @@ if __name__ == '__main__':
             local_output_file_path = easygui.filesavebox('Scegli dove salvare il file di output',
                                                          default=base_input_filename + '_OUT' + extension)
 
+    if args.fa is not None:
+        fa = float(args.fa)
+        if fa == -1.0:
+            fa_string = ''
+        else:
+            fa_string = ' -fa {}'.format(fa)
+    else:
+        fa_string = ''
+
     # sim configuration
     if args.sd is not None and args.gd is not None and args.cd is not None:
         sim_days = args.sd
         gra_days = args.gd
         cut_depth = args.cd
     else:
+
 
         msg = "Scegli i parametri di simulazione"
         title = "CCSIM Parametri"
@@ -154,7 +165,8 @@ if __name__ == '__main__':
                           '-sv "glpk" ' \
                           '-cd {cut} ' \
                           '-s {seed} '\
-                          '{avra}'\
+                          '{avra}' \
+                          '{fa}'\
                           .format(int=INTERPRETER_PATH, script=MAIN_PATH,
                                   folder=xlsread_output_folder,
                                   pro_out=remote_output_file_path,
@@ -162,7 +174,8 @@ if __name__ == '__main__':
                                   gra_days=gra_days,
                                   cut=cut_depth,
                                   seed=14687458,
-                                  avra='-ob "agent_cost_avramidis"' if use_avra else '')
+                                  avra='-ob "agent_cost_avramidis"' if use_avra else '',
+                                  fa=fa_string)
 
         lgr.debug(program_command)
         r_i.do_command(program_command, background=batch_mode)
