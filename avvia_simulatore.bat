@@ -9,12 +9,12 @@ echo -----------------------
 echo server config selected:  %file%
 echo -----------------------
 echo.
-echo Scegli se vuoi eseguire il programma in batch:
+echo Scegli se vuoi eseguire il programma in baackground:
 CHOICE /C SNC /M "(S per Si, N per No, C per Cancel)"
 
 IF ERRORLEVEL 1 SET BT=yes
 IF ERRORLEVEL 2 SET BT=no
-IF ERRORLEVEL 2 EXIT 0
+IF ERRORLEVEL 3 EXIT 0
 
 python prmk_main.py -c "%file%" -bt %BT%
 pause
