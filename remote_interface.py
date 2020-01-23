@@ -11,7 +11,7 @@ class RemoteInterface:
         self.password = password
 
     def __enter__(self):
-        config = fabric.Config(overrides={'sudo': {'password': sudo_pass}})
+        config = fabric.Config(overrides={'sudo': {'password': self.password}})
         self.c = fabric.Connection(host=self.host,
                               user=self.user,
                               port=self.port,
