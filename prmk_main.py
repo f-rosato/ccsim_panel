@@ -14,6 +14,9 @@ DEF_GD = 8
 DEF_CD = 0.1
 USE_DEF = 'S'
 
+DEF_SW = 0.648
+DEF_AC = 0.5
+
 if __name__ == '__main__':
 
     # SETUP ---------------------------------------------------------
@@ -30,6 +33,10 @@ if __name__ == '__main__':
     arg_parser.add_argument('-cd', help='cut depth', required=False)
     arg_parser.add_argument('-fa', help='force alpha', required=False)
     arg_parser.add_argument('-pc', help='print commands', required=False, default=False)
+
+    arg_parser.add_argument('-ac', help='agent activation cost', required=False)
+    arg_parser.add_argument('-sw', help='skill weight', required=False)
+
     args = arg_parser.parse_args()
 
     config_filename = args.c
@@ -96,6 +103,8 @@ if __name__ == '__main__':
         sim_days = args.sd
         gra_days = args.gd
         cut_depth = args.cd
+        skl_wt = args.sw
+        act_cost = args.ac
     else:
 
 
@@ -104,11 +113,16 @@ if __name__ == '__main__':
         fieldNames = ["Giorni simulati per valutare SL",
                       "Giorni simulati per valutare gradiente",
                       "Cut depth",
-                      "Usa funzione costo semplificata (S/N)"]
+                      "Usa funzione costo semplificata (S/N)"
+                      "Costo attivazione agente"
+                      "Peso multiskill"]
         fieldValues_df = [args.sd if args.sd is not None else DEF_SD,
                           args.gd if args.gd is not None else DEF_GD,
                           '{:.0%}'.format(args.cd) if args.cd is not None else '{:.0%}'.format(DEF_CD),
-                          USE_DEF]
+                          USE_DEF,
+                          args.ac if args.sd is not None else DEF_AC,
+                          args.sw if args.sd is not None else DEF_SW
+                          ]
 
         fieldValues = easygui.multenterbox(msg, title, fieldNames, fieldValues_df)
 
@@ -133,7 +147,9 @@ if __name__ == '__main__':
         sim_days = fieldValues[0]
         gra_days = fieldValues[1]
         cut_depth = str(float(fieldValues[2].rstrip('%'))/100)
-        use_avra = True if fieldValues[3] == 'S' else False
+        use_comapp_cost = True if fieldValues[3] == 'S' else False
+        skl_wt = fieldValues[4]
+        act_cost = fieldValues[5]
 
     with RemoteInterface(host, ssh_port, username, password) as r_i:
 
@@ -175,7 +191,7 @@ if __name__ == '__main__':
                                   gra_days=gra_days,
                                   cut=cut_depth,
                                   seed=14687458,
-                                  avra='-ob "agent_cost_avramidis"' if use_avra else '',
+                                  avra='-ob "agent_cost_comapp" -ac {} -sw {}'.format(act_cost, skl_wt) if use_comapp_cost else '',
                                   fa=fa_string)
 
         lgr.debug(program_command)
