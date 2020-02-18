@@ -107,14 +107,13 @@ if __name__ == '__main__':
         act_cost = args.ac
     else:
 
-
         msg = "Scegli i parametri di simulazione"
         title = "CCSIM Parametri"
         fieldNames = ["Giorni simulati per valutare SL",
                       "Giorni simulati per valutare gradiente",
                       "Cut depth",
-                      "Usa funzione costo semplificata (S/N)"
-                      "Costo attivazione agente"
+                      "Usa funzione costo semplificata (S/N)",
+                      "Costo attivazione agente",
                       "Peso multiskill"]
         fieldValues_df = [args.sd if args.sd is not None else DEF_SD,
                           args.gd if args.gd is not None else DEF_GD,
